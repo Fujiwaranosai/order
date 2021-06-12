@@ -2,8 +2,8 @@ import { Controller, Inject } from '@nestjs/common';
 import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { Crud, CrudController, CrudRequest } from '@nestjsx/crud';
 import { OrderEntity } from 'db';
+import { LogCommand } from 'log';
 
-import { LogCommand } from '../../log';
 import { AppService } from './app.service';
 import { OrderCommand } from './order.command';
 
