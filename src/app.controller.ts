@@ -1,5 +1,5 @@
-import { Controller, Inject } from '@nestjs/common';
-import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
+import { BadRequestException, Controller, Inject } from '@nestjs/common';
+import { ClientProxy, MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { Crud, CrudController, CrudRequest } from '@nestjsx/crud';
 import { OrderEntity } from 'db';
 import { LogCommand } from 'log';
@@ -21,12 +21,16 @@ export class AppController implements CrudController<OrderEntity> {
   }
 
   @MessagePattern(OrderCommand.From.Call)
-  orderFromCall(@Payload() payload: { request: CrudRequest; body: OrderEntity }) {
+  async orderFromCall(@Payload() payload: { request: CrudRequest; body: OrderEntity }) {
     this.logClient.emit(LogCommand.Log.Info, {
       channel: OrderCommand.From.Call,
       content: JSON.stringify(payload),
     });
 
-    return this.base.createOneBase(payload.request, payload.body);
+    try {
+      return await this.base.createOneBase(payload.request, payload.body);
+    } catch (ignore) {
+      throw new BadRequestException('Cannot create order');
+    }
   }
 }
